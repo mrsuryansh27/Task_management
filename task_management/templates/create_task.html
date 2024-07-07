@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Task</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Create Task</h2>
+        <form id="createTaskForm" method="POST" action="{% url 'create_task' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_title">Title</label>
+                <input type="text" class="form-control" id="id_title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="id_description">Description</label>
+                <textarea class="form-control" id="id_description" name="description" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Task</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#createTaskForm').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: formData,
+                    success: function(response) {
+                        alert(response.message);
+                        window.location.href = "{% url 'task_management' %}";  // Redirect to task management page
+                    },
+                    error: function(xhr, errmsg, err) {
+                        var errors = xhr.responseJSON.error;
+                        var errorMessages = "";
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessages += field + ": " + errors[field] + "\n";
+                            }
+                        }
+                        alert('Error creating task:\n' + errorMessages);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
